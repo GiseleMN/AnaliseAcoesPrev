@@ -1,0 +1,23 @@
+from prophet.plot import plot_plotly
+from prophet import Prophet
+import yfinance as yf
+
+ticker = input("Digite o ticker da ação desejada:")
+
+acao = yf.Ticker(ticker).history("2y")
+acao.Close.plot()
+dados = acao.reset_index()
+colunas = ['Date', 'Close']
+dados = dados[colunas]
+dados['Date'] = dados['Date'].dt.tz_localize(None)
+dados.columns = ['ds', 'y']
+dados
+
+
+modelo = Prophet()
+modelo.fit(dados)
+
+periodo = modelo.make_future_dataframe(90)
+previsoes = modelo.predict(periodo)
+
+plot_plotly(modelo, previsoes)
